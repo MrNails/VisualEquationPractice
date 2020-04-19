@@ -1,0 +1,56 @@
+﻿<Window x:Class="VisualEquation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisualEquation"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="800" MinHeight="300" MinWidth="500"> 
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="Width" Value="100"/>
+        </Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="Width" Value="100"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="270" />
+        </Grid.ColumnDefinitions>
+        <Canvas x:Name="MainPaintField">
+        </Canvas>
+        <WrapPanel Grid.Column="1">
+            <TextBlock Text="Формула: y = х * х - 2 * sin(x)" Margin="40 20 0 0" />
+            <TextBlock Text="Введите интервал Х (от начальной точки до конечной)" TextWrapping="Wrap"  Width="220" Margin="25 10 0 0"/>
+            <TextBox Text="{Binding XStart}" Width="80" Margin="40 10 0 0"/>
+            <TextBox Text="{Binding XEnd}" Width="80" Margin="40 10 0 0"/>
+            <StackPanel Margin="60 10 0 0" Width="150">
+                <TextBlock Text="Введите шаг сетки"/>
+                <TextBox Text="{Binding PaintStep}" TextChanged="PaintStepTextChanged" />
+            </StackPanel>
+            <StackPanel Margin="60 10 0 0" Width="150">
+                <TextBlock Text="Введите шаг Х"/>
+                <TextBox Text="{Binding XStep}" TextChanged="PaintStepTextChanged" />
+            </StackPanel>
+            <StackPanel Margin="15 10 0 0" Width="120">
+                <TextBlock Text="Введите смещение по Х" TextWrapping="Wrap"/>
+                <TextBox Text="{Binding PaintXOffset}" TextChanged="PaintStepTextChanged" />
+            </StackPanel>
+            <StackPanel Margin="15 10 0 0" Width="120">
+                <TextBlock Text="Введите смещение по Y" TextWrapping="Wrap"/>
+                <TextBox Text="{Binding PaintYOffset}" TextChanged="PaintStepTextChanged" />
+            </StackPanel>
+            <CheckBox Content="Центрировать сетку?" FontSize="15" IsChecked="{Binding IsCentering}"
+                      Margin="65 10 0 0"/>
+        </WrapPanel>
+    </Grid>
+</Window>

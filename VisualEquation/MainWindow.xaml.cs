@@ -285,7 +285,7 @@ namespace VisualEquation
                 for (double x = XStart; x <= XEnd && i < y.Length; x += XStep, i++)
                 {
                     //-1 нужен для того, чтобы правильно отрисовывать рисунок (инвертировать направление, т.к. чем меньше координата, тем выше
-                    y[i] = -1 * (x * x - 2 * Math.Sin(x * (180 / Math.PI)));
+                    y[i] = -1 * (x * x - 2 * Math.Sin(x));
                 }
 
                 DrawEquation();
@@ -307,8 +307,8 @@ namespace VisualEquation
                     //Проверка на границы поля 
                     if (x * PaintStep + PaintXOffset * PaintStep + startYMainLine >= 0 &&
                         x * PaintStep + XStep * PaintStep + PaintXOffset * PaintStep + startYMainLine <= paintField.ActualWidth &&
-                        y[i] + PaintYOffset * PaintStep + startXMainLine >= 0 &&
-                        y[i + 1] + PaintYOffset * PaintStep + startXMainLine <= paintField.ActualHeight)
+                        y[i] * PaintStep + PaintYOffset * PaintStep + startXMainLine >= 0 &&
+                        y[i + 1] * PaintStep + PaintYOffset * PaintStep + startXMainLine <= paintField.ActualHeight)
                     {
                         geometryGroup.Children.Add(new LineGeometry(new Point(x * PaintStep + PaintXOffset * PaintStep + startYMainLine, y[i] * PaintStep + PaintYOffset * PaintStep + startXMainLine),
                                                                     new Point(x * PaintStep + XStep * PaintStep + PaintXOffset * PaintStep + startYMainLine, y[i + 1] * PaintStep + PaintYOffset * PaintStep + startXMainLine)));
@@ -330,6 +330,7 @@ namespace VisualEquation
             DataContext = null;
             this.Loaded += WindowLoaded;
             this.SizeChanged += WindowSizeChanged;
+            this.MinHeight = 350;
         }
 
         private void PaintField()

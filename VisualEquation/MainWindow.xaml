@@ -51,6 +51,8 @@
             </StackPanel>
             <CheckBox Content="Центрировать сетку?" FontSize="15" IsChecked="{Binding IsCentering}"
                       Margin="65 10 0 0"/>
+            <TextBlock x:Name="Debu1" TextWrapping="Wrap" Margin="65 10 0 0"/>
+            <TextBlock x:Name="Debu2" TextWrapping="Wrap" Margin="65 10 0 0"/>
         </WrapPanel>
     </Grid>
 </Window>

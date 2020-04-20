@@ -22,6 +22,10 @@ namespace VisualEquation
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Point OldPoint;
+        private Point CurrentPoint;
+        private bool isMouseDown;
+
         class VisualEquation : INotifyPropertyChanged
         {
             /*
@@ -33,7 +37,7 @@ namespace VisualEquation
              */
             private Canvas paintField;
             private Path equationPath;
-            private double[] y;
+            private double?[] y;
             private double xStart;
             private double xEnd;
             private double xStep;
@@ -89,7 +93,7 @@ namespace VisualEquation
                 CalculateEquation();
             }
 
-            public double[] Y { get { return y; } }
+            public double?[] Y { get { return y; } }
             public Canvas Field { get { return paintField; } }
             public Path EquationPath { get { return equationPath; } }
 
@@ -118,7 +122,13 @@ namespace VisualEquation
                 get { return paintXOffset; }
                 set
                 {
+                    if (value != 0)
+                    {
+                        IsCentering = false;
+                    }
+
                     paintXOffset = value;
+
                     OnPropertyChanged("PaintXOffset");
                     PaintField();
                     CalculateEquation();
@@ -129,7 +139,13 @@ namespace VisualEquation
                 get { return paintYOffset; }
                 set
                 {
+                    if (value != 0)
+                    {
+                        IsCentering = false;
+                    }
+
                     paintYOffset = value;
+
                     OnPropertyChanged("PaintYOffset");
                     PaintField();
                     CalculateEquation();
@@ -143,14 +159,10 @@ namespace VisualEquation
                     if (value > 0)
                     {
                         paintStep = value;
+                        OnPropertyChanged("PaintStep");
+                        PaintField();
+                        CalculateEquation();
                     }
-                    else
-                    {
-                        paintStep = 20;
-                    }
-                    OnPropertyChanged("PaintStep");
-                    PaintField();
-                    CalculateEquation();
                 }
             }
             public double XStep
@@ -161,13 +173,9 @@ namespace VisualEquation
                     if (value > 0)
                     {
                         xStep = value;
+                        OnPropertyChanged("XStep");
+                        CalculateEquation();
                     }
-                    else
-                    {
-                        xStep = 1;
-                    }
-                    OnPropertyChanged("XStep");
-                    CalculateEquation();
                 }
             }
             public bool IsCentering
@@ -176,6 +184,10 @@ namespace VisualEquation
                 set
                 {
                     isCentering = value;
+
+                    PaintYOffset = 0;
+                    PaintXOffset = 0;
+
                     OnPropertyChanged("IsCentering");
                     PaintField();
                     CalculateEquation();
@@ -214,6 +226,37 @@ namespace VisualEquation
                     {
                         startYMainLine = (int)(paintField.ActualWidth / 2) - (int)(paintField.ActualWidth / 2) % PaintStep;
                     }
+                } 
+                else
+                {
+                    //Выравнивание оси ох
+                    if (startXMainLine % PaintStep != 0)
+                    {
+                        if (startXMainLine % PaintStep > PaintStep / 2)
+                        {
+                            startXMainLine = startXMainLine - startXMainLine % PaintStep;
+                            startXMainLine += PaintStep;
+                        }
+                        else
+                        {
+                            startXMainLine = startXMainLine - startXMainLine % PaintStep;
+                        }
+                        
+                    }
+
+                    //Выравнивание оси оу
+                    if (startYMainLine % PaintStep != 0)
+                    {
+                        if (startYMainLine % PaintStep > PaintStep / 2)
+                        {
+                            startYMainLine = startYMainLine - startYMainLine % PaintStep;
+                        } 
+                        else
+                        {
+                            startYMainLine = startYMainLine - startYMainLine % PaintStep;
+                            startYMainLine += PaintStep;
+                        }
+                    }
                 }
 
                 xPath.Stroke = new SolidColorBrush(Colors.LightGray);
@@ -244,25 +287,25 @@ namespace VisualEquation
                 mainLinePath.StrokeThickness = 1;
 
                 //Проверка на то, находяться ли линии ох, оу на поле
-                if (startXMainLine + PaintYOffset * paintStep >= 0 && startXMainLine + PaintYOffset * paintStep <= paintField.ActualHeight)
+                if (startXMainLine + PaintYOffset * PaintStep >= 0 && startXMainLine + PaintYOffset * PaintStep <= paintField.ActualHeight)
                 {
-                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(0, startXMainLine + PaintYOffset * paintStep),
-                                                                        new Point(paintField.ActualWidth, startXMainLine + PaintYOffset * paintStep)));
+                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(0, startXMainLine + PaintYOffset * PaintStep + PaintStep),
+                                                                        new Point(paintField.ActualWidth, startXMainLine + PaintYOffset * PaintStep + PaintStep)));
                     //Стрелка
-                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(paintField.ActualWidth - 15, startXMainLine + PaintYOffset * paintStep - 5),
-                                                                        new Point(paintField.ActualWidth, startXMainLine + PaintYOffset * paintStep)));
-                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(paintField.ActualWidth - 15, startXMainLine + PaintYOffset * paintStep + 5),
-                                                                        new Point(paintField.ActualWidth, startXMainLine + PaintYOffset * paintStep)));
+                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(paintField.ActualWidth - 15, startXMainLine + PaintYOffset * PaintStep - 5 + PaintStep),
+                                                                        new Point(paintField.ActualWidth, startXMainLine + PaintYOffset * paintStep + PaintStep)));
+                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(paintField.ActualWidth - 15, startXMainLine + PaintYOffset * PaintStep + 5 + PaintStep),
+                                                                        new Point(paintField.ActualWidth, startXMainLine + PaintYOffset * PaintStep + PaintStep)));
                 }
-                if (startYMainLine + PaintXOffset * paintStep >= 0 && startYMainLine + PaintXOffset * paintStep <= paintField.ActualWidth)
+                if (startYMainLine + PaintXOffset * PaintStep >= 0 && startYMainLine + PaintXOffset * PaintStep <= paintField.ActualWidth)
                 {
-                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(startYMainLine + PaintXOffset * paintStep, 0),
-                                                                        new Point(startYMainLine + PaintXOffset * paintStep, paintField.ActualHeight)));
+                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(startYMainLine + PaintXOffset * PaintStep, 0),
+                                                                        new Point(startYMainLine + PaintXOffset * PaintStep, paintField.ActualHeight)));
                     //Стрелка
-                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(startYMainLine + PaintXOffset * paintStep + 5, 15),
-                                                                        new Point(startYMainLine + PaintXOffset * paintStep, 0)));
-                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(startYMainLine + PaintXOffset * paintStep - 5, 15),
-                                                                        new Point(startYMainLine + PaintXOffset * paintStep, 0)));
+                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(startYMainLine + PaintXOffset * PaintStep + 5, 15),
+                                                                        new Point(startYMainLine + PaintXOffset * PaintStep, 0)));
+                    mainLineGeometryGroup.Children.Add(new LineGeometry(new Point(startYMainLine + PaintXOffset * PaintStep - 5, 15),
+                                                                        new Point(startYMainLine + PaintXOffset * PaintStep, 0)));
                 }
 
                 //Проврка на присутсвтвие линий в коллекции
@@ -279,13 +322,22 @@ namespace VisualEquation
                     return;
                 }
 
-                y = new double[(int)((Math.Abs(XStart) + Math.Abs(XEnd)) / XStep) + 1];
+                y = new double?[(int)((Math.Abs(XStart) + Math.Abs(XEnd)) / XStep) + 1];
 
                 int i = 0;
                 for (double x = XStart; x <= XEnd && i < y.Length; x += XStep, i++)
                 {
                     //-1 нужен для того, чтобы правильно отрисовывать рисунок (инвертировать направление, т.к. чем меньше координата, тем выше
-                    y[i] = -1 * (x * x - 2 * Math.Sin(x));
+                    //y[i] = -1 * (x * x - 2 * Math.Sin(x));
+                    x = Math.Round(x, 4);
+                    if (x < 0)
+                    {
+                        y[i] = null;
+                    } else
+                    {
+                        y[i] = -Math.Sqrt(x);
+                    }
+                    
                 }
 
                 DrawEquation();
@@ -304,21 +356,25 @@ namespace VisualEquation
                 int i = 0;
                 for (double x = XStart; i < y.Length - 1; i++, x += XStep)
                 {
+                    if (y[i] == null)
+                    {
+                        continue;
+                    }
+
                     //Проверка на границы поля 
                     if (x * PaintStep + PaintXOffset * PaintStep + startYMainLine >= 0 &&
                         x * PaintStep + XStep * PaintStep + PaintXOffset * PaintStep + startYMainLine <= paintField.ActualWidth &&
-                        y[i] * PaintStep + PaintYOffset * PaintStep + startXMainLine >= 0 &&
-                        y[i + 1] * PaintStep + PaintYOffset * PaintStep + startXMainLine <= paintField.ActualHeight)
+                        y[i].Value * PaintStep + PaintYOffset * PaintStep + startXMainLine >= 0 &&
+                        y[i + 1].Value * PaintStep + PaintYOffset * PaintStep + startXMainLine <= paintField.ActualHeight)
                     {
-                        geometryGroup.Children.Add(new LineGeometry(new Point(x * PaintStep + PaintXOffset * PaintStep + startYMainLine, y[i] * PaintStep + PaintYOffset * PaintStep + startXMainLine),
-                                                                    new Point(x * PaintStep + XStep * PaintStep + PaintXOffset * PaintStep + startYMainLine, y[i + 1] * PaintStep + PaintYOffset * PaintStep + startXMainLine)));
+                        geometryGroup.Children.Add(new LineGeometry(new Point(x * PaintStep + PaintXOffset * PaintStep + startYMainLine, y[i].Value * PaintStep + PaintYOffset * PaintStep + startXMainLine),
+                                                                    new Point(x * PaintStep + XStep * PaintStep + PaintXOffset * PaintStep + startYMainLine, y[i + 1].Value * PaintStep + PaintYOffset * PaintStep + startXMainLine)));
                     }
                 }
 
                 equationPath.Data = geometryGroup;
                 paintField.Children.Add(equationPath);
             }
-
             public void OnPropertyChanged([CallerMemberName]string prop = "")
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
@@ -331,6 +387,25 @@ namespace VisualEquation
             this.Loaded += WindowLoaded;
             this.SizeChanged += WindowSizeChanged;
             this.MinHeight = 350;
+
+            OldPoint = new Point(-10000, -10000);
+            CurrentPoint = new Point(0, 0);
+
+            this.MouseWheel += (obj, arg) =>
+            {
+                if (DataContext is VisualEquation && DataContext != null)
+                {
+                    VisualEquation equation = (VisualEquation)DataContext;
+                    if (arg.Delta > 0)
+                    {
+                        equation.PaintStep++;
+                    } 
+                    else if (arg.Delta < 0)
+                    {
+                        equation.PaintStep--;
+                    }
+                }
+            };
         }
 
         private void PaintField()

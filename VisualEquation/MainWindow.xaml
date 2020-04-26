@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualEquation"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="800" MinHeight="300" MinWidth="500"> 
+        Title="MainWindow" Height="400" Width="800" MinHeight="300" MinWidth="500">
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="15"/>
@@ -34,10 +34,6 @@
             <TextBox Text="{Binding XStart}" Width="80" Margin="40 10 0 0"/>
             <TextBox Text="{Binding XEnd}" Width="80" Margin="40 10 0 0"/>
             <StackPanel Margin="60 10 0 0" Width="150">
-                <TextBlock Text="Введите шаг сетки"/>
-                <TextBox Text="{Binding PaintStep}" TextChanged="PaintStepTextChanged" />
-            </StackPanel>
-            <StackPanel Margin="60 10 0 0" Width="150">
                 <TextBlock Text="Введите шаг Х"/>
                 <TextBox Text="{Binding XStep}" TextChanged="PaintStepTextChanged" />
             </StackPanel>
@@ -49,10 +45,11 @@
                 <TextBlock Text="Введите смещение по Y" TextWrapping="Wrap"/>
                 <TextBox Text="{Binding PaintYOffset}" TextChanged="PaintStepTextChanged" />
             </StackPanel>
-            <CheckBox Content="Центрировать сетку?" FontSize="15" IsChecked="{Binding IsCentering}"
-                      Margin="65 10 0 0"/>
-            <TextBlock x:Name="Debu1" TextWrapping="Wrap" Margin="65 10 0 0"/>
-            <TextBlock x:Name="Debu2" TextWrapping="Wrap" Margin="65 10 0 0"/>
+            <WrapPanel Margin="0 10 0 0" Width="270">
+                <TextBlock Text="Соотношение размера реальной клетки в к нарисованной (клетка равна 1 см):" TextWrapping="Wrap" Width="270" />
+                <TextBlock Text="1 :" TextWrapping="Wrap" Width="270" Height="15" />
+                <TextBlock Text="{Binding DrawingCoeff}" Margin="-120 0 0 0" Height="15" TextAlignment="Left"/>
+            </WrapPanel>
         </WrapPanel>
     </Grid>
 </Window>
